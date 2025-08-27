@@ -21,23 +21,111 @@
 
   <!-- Main  -->
   <main class="grow">
-      <!-- ToDo Display -->
-      <div class="p-6 rounded-xl shadow bg-white bg-blue-400">
-        <h1 class="text-2xl font-bold text-brand">Hello Tailwind</h1>
-        <p class="text-slate-600">HTML thuần, không cần build.</p>
-        
-      </div>
-
 
       <!-- Control Bar -->
-      <div>
+      <div class="p-6 rounded-xl shadow">
+        <!-- <h1 class="text-2xl font-bold text-brand">Hello Tailwind</h1>
+        <p class="text-slate-600">HTML thuần, không cần build.</p>
+         -->
+        <div class="flex justify-between mx-50 gap-4">
+          <div class="flex-1 bg-red-200">
+            Something is here
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <button class="shadow rounded-2xl p-3 border-2"> Thêm </button>
+            <button class="shadow rounded-2xl p-3 border-2"> Tìm kiếm</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ToDo Display -->
+      <div class="bg-red-200 min-h-screen flex flex-col gap-3 py-4">
+
+          <!--Todo Node -->
+          <div class="bg-blue-400 min-h-20 rounded-2xl mx-2 flex flex-col-reverse pb-3">
+
+              <!-- Content-Todo Section -->
+              <span class="text-center">
+                <label for="id" class = "bg-red-200 font-bold " >Deadline: 20h-28/11/2025</label>
+                <p> Hôm nay tôi sẽ mua nhà Hôm nay tôi sẽ mua nhà Hôm na </p>
+              </span>
+
+              <!-- Button-Todo Section -->
+              <div class="justify-between flex mx-3">
+
+                  <label class="inline-flex items-center gap-2">
+                    <input id="done" name="done" type="checkbox"
+                          class="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>Đã hoàn thành</span>
+                  </label>
+
+                  <button aria-label="Xóa"
+                    class="p-2 rounded hover:bg-gray-200 text-red-600
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+                    <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M3 6h18"/>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                      <path d="M10 11v6M14 11v6"/>
+                      <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+
+
+
+              </div>
+            
+
+              
+          </div>
+        
+
+          <!--Todo Node -->
+          <div class="bg-blue-400 min-h-20 rounded-2xl mx-2 flex flex-col-reverse pb-3">
+
+              <!-- Content-Todo Section -->
+              <span class="text-center">
+                <label for="id" class = "bg-red-200 font-bold " >Deadline: 20h-28/11/2025</label>
+                <p> Hôm nay tôi sẽ mua nhà Hôm nay tôi sẽ mua nhà Hôm na </p>
+              </span>
+
+              <!-- Button-Todo Section -->
+              <div class="justify-between flex mx-3">
+
+                  <label class="inline-flex items-center gap-2">
+                    <input id="done" name="done" type="checkbox"
+                          class="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>Đã hoàn thành</span>
+                  </label>
+
+                  <button 
+                    class="p-2 rounded hover:bg-gray-200 text-red-600
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="black">
+                      <path d="M3 6h18"/>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                      <path d="M10 11v6M14 11v6"/>
+                      <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+
+
+
+              </div>
+            
+
+              
+          </div>
+        
 
       </div>
 
-    </main>
+  </main>
 
-  <footer class="mt-auto text-center bg-blue-400 mx-2 rounded-2xl  flex items-center justify-center flex-col border-2 gap-2 pt-5">
-
+  <!--Footer Section -->
+  <footer class="mt-auto text-center bg-blue-400 mx-2 rounded-2xl  flex justify-center border-2 gap-2 pt-5">
+      Power 
   </footer>
   
 </body>
