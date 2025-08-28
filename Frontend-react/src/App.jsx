@@ -10,14 +10,13 @@ import { listTodos, createTodo as apiCreateTodo, updateTodo as apiUpdateTodo, de
 import { getAccessToken } from './api/http'
 
 export default function App() {
-  const [mode, setMode] = useState('unknown') // 'local' | 'api'
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
   const [todos, setTodos] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
 
   const fetchTodos = async (term) => {
-    if (mode !== 'api') return
+    if (!user) return
     setLoading(true)
     try {
       const data = await listTodos({
@@ -33,111 +32,50 @@ export default function App() {
   }
 
   const addTodo = async (title, deadline) => {
-    if (!title?.trim()) return
-    if (mode === 'api') {
-      const created = await apiCreateTodo({ title: title.trim(), deadline: deadline || null })
-      setTodos(prev => [created, ...prev])
-      return
-    }
-    const id = Date.now()
-    setTodos((prev) => [
-      { id, title: title.trim(), deadline: deadline || new Date().toISOString(), done: false },
-      ...prev,
-    ])
+    if (!title?.trim() || !user) return
+    const created = await apiCreateTodo({ title: title.trim(), deadline: deadline || null })
+    setTodos(prev => [created, ...prev])
   }
 
   const toggleTodo = async (id) => {
-    if (mode === 'api') {
-      const cur = todos.find(t => t.id === id)
-      if (!cur) return
-      const updated = await apiUpdateTodo(id, { done: !cur.done })
-      setTodos(prev => prev.map(t => t.id === id ? updated : t))
-      return
-    }
-    setTodos((prev) => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
+    if (!user) return
+    const cur = todos.find(t => t.id === id)
+    if (!cur) return
+    const updated = await apiUpdateTodo(id, { done: !cur.done })
+    setTodos(prev => prev.map(t => t.id === id ? updated : t))
   }
 
   const deleteTodo = async (id) => {
-    if (mode === 'api') {
-      await apiDeleteTodo(id)
-      setTodos(prev => prev.filter(t => t.id !== id))
-      return
-    }
-    setTodos((prev) => prev.filter(t => t.id !== id))
+    if (!user) return
+    await apiDeleteTodo(id)
+    setTodos(prev => prev.filter(t => t.id !== id))
   }
 
   const onSearch = (term) => {
     const next = term ?? ''
     setSearchTerm(next)
-    if (mode === 'api') fetchTodos(next)
+    if (user) fetchTodos(next)
   }
 
-  const shownTodos = mode === 'api'
-    ? todos
-    : todos
-        .filter(t =>
-          !searchTerm
-            ? true
-            : t.title.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        .slice()
-        .sort((a, b) => {
-          if (a.done !== b.done) return a.done ? 1 : -1
-          const da = new Date(a.deadline).getTime() || 0
-          const db = new Date(b.deadline).getTime() || 0
-          return da - db
-        })
-
-  // Auth bootstrap: decide mode and try to fetch user + todos if token exists
   useEffect(() => {
     const token = getAccessToken?.()
     if (token) {
-      setMode('api')
       ;(async () => {
         try {
           const u = await me()
           setUser(u)
           await fetchTodos(searchTerm)
-        } catch {
-          // token invalid → fallback to local
-          setMode('local')
-        }
+        } catch {}
       })()
-    } else {
-      setMode('local')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  // Local mode: bootstrap from localStorage
-  useEffect(() => {
-    if (mode !== 'local') return
-    try {
-      const raw = localStorage.getItem('todos')
-      const saved = raw ? JSON.parse(raw) : null
-      if (Array.isArray(saved)) setTodos(saved)
-      const savedSearch = localStorage.getItem('searchTerm')
-      if (typeof savedSearch === 'string') setSearchTerm(savedSearch)
-    } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
-
-  // Persist local mode changes
-  useEffect(() => {
-    if (mode !== 'local') return
-    try { localStorage.setItem('todos', JSON.stringify(todos)) } catch {}
-  }, [todos, mode])
-  useEffect(() => {
-    if (mode !== 'local') return
-    try { localStorage.setItem('searchTerm', searchTerm) } catch {}
-  }, [searchTerm, mode])
 
   const handleLogin = async ({ email, password }) => {
     setLoading(true)
     try {
       const res = await apiLogin({ email, password })
       setUser(res?.user || null)
-      setMode('api')
       await fetchTodos(searchTerm)
     } finally {
       setLoading(false)
@@ -159,7 +97,7 @@ export default function App() {
     try {
       await apiLogout()
       setUser(null)
-      setMode('local')
+      setTodos([])
     } finally {
       setLoading(false)
     }
@@ -172,15 +110,18 @@ export default function App() {
       <main className="grow p-4 space-y-3">
         <AuthBox user={user} onLogin={handleLogin} onRegister={handleRegister} onLogout={handleLogout} loading={loading} />
         <ControlBar
-          onAdd={addTodo}
-          onSearch={onSearch}
+          onAdd={user ? addTodo : undefined}
+          onSearch={user ? onSearch : undefined}
           searchTerm={searchTerm}
-          resultsCount={shownTodos.length}
+          resultsCount={todos.length}
+          disabled={!user || loading}
         />
-        {loading && mode === 'api' ? (
+        {loading && user ? (
           <div className="rounded-xl border p-4 bg-white text-slate-500">Đang tải dữ liệu...</div>
+        ) : user ? (
+          <TodoList todos={todos} onToggle={toggleTodo} onDelete={deleteTodo} />
         ) : (
-          <TodoList todos={shownTodos} onToggle={toggleTodo} onDelete={deleteTodo} />
+          <div className="rounded-xl border p-4 bg-white text-slate-500">Vui lòng đăng nhập để sử dụng ứng dụng.</div>
         )}
       </main>
 

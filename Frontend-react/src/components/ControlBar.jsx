@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 
-export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCount = 0 }) {
+export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCount = 0, disabled = false }) {
   const [title, setTitle] = useState('')
   const [deadline, setDeadline] = useState('')
   const [query, setQuery] = useState('')
   const [titleErr, setTitleErr] = useState('')
   const [deadlineErr, setDeadlineErr] = useState('')
 
-  // Keep local query in sync when external searchTerm changes
   useEffect(() => {
     setQuery(searchTerm)
   }, [searchTerm])
@@ -19,7 +18,7 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
       return ''
     },
     deadline(value) {
-      if (!value) return '' // optional
+      if (!value) return ''
       const t = Date.parse(value)
       if (Number.isNaN(t)) return 'Định dạng thời gian không hợp lệ'
       return ''
@@ -27,6 +26,7 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
   }), [])
 
   const handleAdd = () => {
+    if (disabled) return
     const tErr = validate.title(title)
     const dErr = validate.deadline(deadline)
     setTitleErr(tErr)
@@ -38,6 +38,7 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
   }
 
   const handleSearch = () => {
+    if (disabled) return
     onSearch?.(query)
   }
 
@@ -59,6 +60,7 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              disabled={disabled}
             />
             {titleErr && <span className="text-sm text-red-600">{titleErr}</span>}
           </label>
@@ -70,6 +72,7 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              disabled={disabled}
             />
             {deadlineErr && <span className="text-sm text-red-600">{deadlineErr}</span>}
           </label>
@@ -87,17 +90,18 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
                 if (e.key === 'Enter') handleSearch()
                 if (e.key === 'Escape') handleClearSearch()
               }}
+              disabled={disabled}
             />
           </label>
           <div className="flex gap-2">
-            <button className="shadow rounded-2xl px-4 py-2 border bg-blue-50 text-blue-700" onClick={handleAdd}>
+            <button className={`shadow rounded-2xl px-4 py-2 border ${disabled ? 'bg-blue-50/50 text-blue-300 cursor-not-allowed' : 'bg-blue-50 text-blue-700'}`} onClick={handleAdd} disabled={disabled}>
               Thêm
             </button>
-            <button className="shadow rounded-2xl px-4 py-2 border bg-gray-50 text-gray-700" onClick={handleSearch}>
+            <button className={`shadow rounded-2xl px-4 py-2 border ${disabled ? 'bg-gray-50/50 text-gray-400 cursor-not-allowed' : 'bg-gray-50 text-gray-700'}`} onClick={handleSearch} disabled={disabled}>
               Tìm kiếm
             </button>
             {searchTerm && (
-              <button className="shadow rounded-2xl px-4 py-2 border bg-red-50 text-red-700" onClick={handleClearSearch}>
+              <button className={`shadow rounded-2xl px-4 py-2 border ${disabled ? 'bg-red-50/50 text-red-300 cursor-not-allowed' : 'bg-red-50 text-red-700'}`} onClick={handleClearSearch} disabled={disabled}>
                 Xóa tìm
               </button>
             )}
@@ -112,3 +116,4 @@ export default function ControlBar({ onAdd, onSearch, searchTerm = '', resultsCo
     </div>
   )
 }
+

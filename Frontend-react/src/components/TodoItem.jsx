@@ -1,10 +1,11 @@
 export default function TodoItem({ todo, onToggle, onDelete }) {
   const deadlineLabel = (() => {
+    if (!todo.deadline) return 'Không có'
     try {
       const d = new Date(todo.deadline)
       return d.toLocaleString('vi-VN')
     } catch {
-      return todo.deadline
+      return String(todo.deadline)
     }
   })()
 
@@ -21,13 +22,15 @@ export default function TodoItem({ todo, onToggle, onDelete }) {
             className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
             checked={todo.done}
             onChange={() => onToggle?.(todo.id)}
+            disabled={!onToggle}
           />
           <span>Đã hoàn thành</span>
         </label>
         <button
-          className="p-2 rounded hover:bg-gray-100 text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+          className={`p-2 rounded hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 ${onDelete ? 'text-red-600 focus-visible:ring-red-500' : 'text-red-300 cursor-not-allowed'}`}
           aria-label="Xóa"
           onClick={() => onDelete?.(todo.id)}
+          disabled={!onDelete}
         >
           <svg aria-hidden="true" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M3 6h18"/>
@@ -40,3 +43,4 @@ export default function TodoItem({ todo, onToggle, onDelete }) {
     </div>
   )
 }
+
